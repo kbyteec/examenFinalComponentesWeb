@@ -1,0 +1,224 @@
+<main
+  class="min-vh-100 py-4"
+  [class.bg-dark]="temaOscuro"
+  [class.text-white]="temaOscuro"
+  [class.bg-light]="!temaOscuro"
+>
+  <div class="container">
+  <header class="text-bg-dark rounded-3 shadow p-4 mb-3">
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-lg">
+        <h1 class="h2 fw-bold mb-2">{{ titulo }}</h1>
+        <p class="mb-0 opacity-75">Diego Roberto Díaz Chávez - Integración de Componentes Web: 30510</p>
+      </div>
+
+      <div class="col-12 col-lg-auto d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center">
+        <button
+          class="btn"
+          [class.btn-light]="!temaOscuro"
+          [class.btn-outline-light]="temaOscuro"
+          type="button"
+          (click)="cambiarTema()"
+        >
+          {{ temaOscuro ? 'Tema claro' : 'Tema oscuro' }}
+        </button>
+
+        <div class="bg-white text-black rounded-3 text-center px-4 py-3 shadow-sm">
+          <span class="d-block small fw-semibold">Equipos registrados</span>
+          <strong class="d-block display-6 lh-1">{{ equipos.length }}</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div
+    class="alert mb-3"
+    [class.alert-success]="estadoOnline"
+    [class.alert-warning]="!estadoOnline"
+    role="alert"
+  >
+    Estado de conexion:
+    <strong>{{ estadoOnline ? 'En linea' : 'Sin conexion - usando LocalStorage' }}</strong>
+  </div>
+
+  @if (mensaje) {
+    <div class="alert alert-success" role="alert">{{ mensaje }}</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  }
+
+  <section class="row g-3 mb-3">
+    <div class="col-12 col-lg-7">
+      <article
+        class="card border-secondary-subtle shadow h-100"
+        [class.text-bg-secondary]="temaOscuro"
+      >
+        <div class="card-header text-bg-dark">
+          <h2 class="h5 mb-0">Registrar equipo</h2>
+        </div>
+
+        <div class="card-body">
+          <form class="row g-3" (ngSubmit)="registrarEquipo()">
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold" for="nombre">Nombre</label>
+              <input id="nombre" class="form-control" name="nombre" [(ngModel)]="nuevoEquipo.nombre" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold" for="categoria">Categoria</label>
+              <input id="categoria" class="form-control" name="categoria" [(ngModel)]="nuevoEquipo.categoria" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold" for="laboratorio">Laboratorio</label>
+              <input id="laboratorio" class="form-control" name="laboratorio" [(ngModel)]="nuevoEquipo.laboratorio" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold" for="estado">Estado</label>
+              <select id="estado" class="form-select" name="estado" [(ngModel)]="nuevoEquipo.estado">
+                <option value="Disponible">Disponible</option>
+                <option value="En mantenimiento">En mantenimiento</option>
+                <option value="Prestado">Prestado</option>
+                <option value="Fuera de servicio">Fuera de servicio</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold" for="responsable">Responsable</label>
+              <input id="responsable" class="form-control" name="responsable" [(ngModel)]="nuevoEquipo.responsable" />
+            </div>
+
+            <div class="col-12">
+              <button class="btn btn-primary w-100" type="submit">Registrar equipo</button>
+            </div>
+          </form>
+        </div>
+      </article>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <article
+        class="card border-secondary-subtle shadow h-100"
+        [class.text-bg-secondary]="temaOscuro"
+      >
+        <div class="card-header text-bg-dark">
+          <h2 class="h5 mb-0">Buscar por codigo</h2>
+        </div>
+
+        <div class="card-body">
+          <div class="input-group mb-3">
+            <input
+              class="form-control"
+              type="number"
+              placeholder="Ej. 1"
+              [(ngModel)]="codigoBusqueda"
+            />
+            <button class="btn btn-outline-secondary" type="button" (click)="buscarEquipo()">Buscar</button>
+          </div>
+
+          @if (equipoEncontrado) {
+            <div class="alert alert-secondary mb-4">
+              <strong class="d-block">{{ equipoEncontrado.codigo }} - {{ equipoEncontrado.nombre }}</strong>
+              <span class="d-block">Categoria: {{ equipoEncontrado.categoria }}</span>
+              <span class="d-block">Estado: {{ equipoEncontrado.estado }}</span>
+              <span class="d-block">Responsable: {{ equipoEncontrado.responsable }}</span>
+            </div>
+          }
+
+          <h2 class="h5 mb-3">Actualizar estado</h2>
+
+          <div class="row g-2">
+            <div class="col-12 col-md-3">
+              <input
+                class="form-control"
+                type="number"
+                placeholder="Codigo"
+                [(ngModel)]="codigoActualizar"
+              />
+            </div>
+            <div class="col-12 col-md">
+              <select class="form-select" [(ngModel)]="nuevoEstado">
+                <option value="">Nuevo estado</option>
+                <option value="Disponible">Disponible</option>
+                <option value="En mantenimiento">En mantenimiento</option>
+                <option value="Prestado">Prestado</option>
+                <option value="Fuera de servicio">Fuera de servicio</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-auto">
+              <button class="btn btn-primary w-100" type="button" (click)="actualizarEstado()">Actualizar</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section
+    class="card border-secondary-subtle shadow mb-3"
+    [class.text-bg-secondary]="temaOscuro"
+  >
+    <div
+      class="card-header d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center"
+      [class.bg-white]="!temaOscuro"
+      [class.bg-dark]="temaOscuro"
+    >
+      <h2
+        class="h5 mb-0"
+        [class.text-dark]="!temaOscuro"
+        [class.text-white]="temaOscuro"
+      >
+        Equipos:
+      </h2>
+      <button class="btn btn-outline-secondary btn-sm" type="button" (click)="cargarEquipos()">
+        Recargar
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table
+        class="table table-hover align-middle mb-0"
+        [class.table-dark]="temaOscuro"
+      >
+        <thead class="table-dark">
+          <tr>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Categoria</th>
+            <th>Laboratorio</th>
+            <th>Estado</th>
+            <th>Responsable</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (equipo of equipos; track equipo.codigo) {
+            <tr>
+              <td>{{ equipo.codigo }}</td>
+              <td>{{ equipo.nombre }}</td>
+              <td>{{ equipo.categoria }}</td>
+              <td>{{ equipo.laboratorio }}</td>
+              <td>
+                <span class="badge text-bg-secondary">{{ equipo.estado }}</span>
+              </td>
+              <td>{{ equipo.responsable }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                {{ cargando ? 'Cargando equipos...' : 'No existen equipos registrados.' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="text-center text-secondary small py-3">
+    Universidad de las Feurzas Armadas - ESPE
+  </footer>
+  </div>
+</main>
